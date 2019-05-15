@@ -11,6 +11,7 @@ import {
 import {model, property} from '@loopback/repository';
 import {expect} from '@loopback/testlab';
 import {
+  api,
   ControllerSpec,
   get,
   getControllerSpec,
@@ -330,6 +331,66 @@ describe('controller spec', () => {
     const spec = getControllerSpec(MyController);
     const globalSchemas = (spec.components || {}).schemas;
     expect(globalSchemas).to.be.empty();
+  });
+
+  it('allows a class to provide definitions of referenced models through #/components/schemas', () => {
+    @api({
+      paths: {
+        '/todos': {
+          get: {
+            'x-operation-name': 'find',
+            'x-controller-name': 'MyController',
+            responses: {
+              '200': {
+                content: {
+                  'application/json': {
+                    schema: {
+                      $ref: '#/components/schemas/Todo',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      components: {
+        schemas: {
+          Todo: {
+            title: 'Todo',
+            properties: {
+              title: {
+                type: 'string',
+              },
+            },
+          },
+        },
+      },
+    })
+    class MyController {
+      async find(): Promise<object[]> {
+        return []; // dummy implementation, it's never called
+      }
+    }
+
+    const spec = getControllerSpec(MyController);
+    const opSpec: OperationObject = spec.paths['/todos'].get;
+    const responseSpec = opSpec.responses['200'].content['application/json'];
+    expect(responseSpec.schema).to.deepEqual({
+      $ref: '#/components/schemas/Todo',
+    });
+
+    const globalSchemas = (spec.components || {}).schemas;
+    expect(globalSchemas).to.deepEqual({
+      Todo: {
+        title: 'Todo',
+        properties: {
+          title: {
+            type: 'string',
+          },
+        },
+      },
+    });
   });
 
   describe('x-ts-type', () => {
