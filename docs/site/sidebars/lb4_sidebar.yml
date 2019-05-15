@@ -148,7 +148,7 @@ children:
   - title: 'Components'
     url: Components.html
     output: 'web, pdf'
-    
+
   - title: 'Interceptors'
     url: Interceptors.html
     output: 'web, pdf'
@@ -321,6 +321,10 @@ children:
 
   - title: 'OpenAPI generator'
     url: OpenAPI-generator.html
+    output: 'web, pdf'
+
+  - title: 'Global interceptor generator'
+    url: Global-interceptor-generator.html
     output: 'web, pdf'
 
   - title: 'Extension generator'
